@@ -1,4 +1,6 @@
+import argparse
 import os
+import sys
 
 import requests
 
@@ -52,10 +54,24 @@ def update_dns_record(api_key, zone_id, record_name):
 # Set your Cloudflare API key, Zone ID, and DNS record name
 API_KEY = os.environ.get("CLOUDFLARE_API_KEY")
 ZONE_ID = "23235e355f09269206d50adec1f88f96"
-RECORD_NAME = "server.junsoo.kr"  # Change this to your DNS record name
+DEFAULT_RECORD_NAME = "server.junsoo.kr"  # Change this to your DNS record name
+
+
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--record-name", default=DEFAULT_RECORD_NAME)
+    parser.add_argument("--api-key", default=API_KEY)
+    args = parser.parse_args(argv)
+
+    if args.api_key is None:
+        raise ValueError("Environment variable CLOUDFLARE_API_KEY not set.")
+
+    # Call the function to update DNS record
+    update_dns_record(args.api_key, ZONE_ID, args.record_name)
+
 
 if __name__ == "__main__":
-    if API_KEY is None:
-        raise ValueError("Environment variable CLOUDFLARE_API_KEY not set.")
-    # Call the function to update DNS record
-    update_dns_record(API_KEY, ZONE_ID, RECORD_NAME)
+    main()
